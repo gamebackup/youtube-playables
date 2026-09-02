@@ -44,8 +44,8 @@
         game: {
           firstFrameReady: function () {},
           gameReady: function () {},
-          loadData: function () { return Promise.resolve(""); },
-          saveData: function () { return Promise.resolve(); }
+          loadData: function () { return Promise.resolve(localStorage.getItem("archery-world-tour-save") || ""); },
+          saveData: function (data) { localStorage.setItem("archery-world-tour-save", data); return Promise.resolve(); }
         },
         engagement: { sendScore: function () { return Promise.resolve(); } },
         ads: {

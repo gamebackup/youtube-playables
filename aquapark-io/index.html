@@ -20,8 +20,8 @@
         game: {
           firstFrameReady: function () {},
           gameReady: function () {},
-          loadData: function () { return Promise.resolve(""); },
-          saveData: function () { return Promise.resolve(); }
+          loadData: function () { return Promise.resolve(localStorage.getItem("aquapark-io-save") || ""); },
+          saveData: function (data) { localStorage.setItem("aquapark-io-save", data); return Promise.resolve(); }
         },
         engagement: { sendScore: function () { return Promise.resolve(); } },
         ads: {
