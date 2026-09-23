@@ -2,61 +2,181 @@
   "avatarlist": [
     {
       "name":           "Samuel",
-      "image_default":  "samuel.png",
-      "logic":          "Casual-Normal"
-    },
-
-    {
-      "name":           "Maria",
-      "image_default":  "maria.png",
+      "image_default":  "man1.png",
       "logic":          "Casual-Normal"
     },
 
     {
       "name":           "David",
-      "image_default":  "david.png",
+      "image_default":  "man2.png",
       "logic":          "Casual-Normal"
     },
 
     {
       "name":           "Gabriel",
-      "image_default":  "gabriel.png",
+      "image_default":  "man3.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "James",
+      "image_default":  "man4.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Michael",
+      "image_default":  "man5.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Daniel",
+      "image_default":  "man6.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Lucas",
+      "image_default":  "man7.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Ethan",
+      "image_default":  "man8.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Noah",
+      "image_default":  "man9.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Liam",
+      "image_default":  "man10.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Oliver",
+      "image_default":  "man11.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Caleb",
+      "image_default":  "man12.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Maria",
+      "image_default":  "woman1.png",
       "logic":          "Casual-Normal"
     },
 
     {
       "name":           "Isabella",
-      "image_default":  "isabella.png",
+      "image_default":  "woman2.png",
       "logic":          "Casual-Normal"
     },
 
     {
       "name":           "Emma",
-      "image_default":  "emma.png",
+      "image_default":  "woman3.png",
       "logic":          "Casual-Normal"
     },
-	
-	{
-      "name":           "Eva",
-      "image_default":  "eva.png",
+
+    {
+      "name":           "Sophia",
+      "image_default":  "woman4.png",
       "logic":          "Casual-Normal"
     },
-	
-	{
-      "name":           "Lara",
-      "image_default":  "lara.png",
+
+    {
+      "name":           "Olivia",
+      "image_default":  "woman5.png",
       "logic":          "Casual-Normal"
     },
-	
-	{
-      "name":           "Milo",
-      "image_default":  "milo.png",
+
+    {
+      "name":           "Amelia",
+      "image_default":  "woman6.png",
       "logic":          "Casual-Normal"
     },
-	
-	{
-      "name":           "Victoria",
-      "image_default":  "victoria.png",
+
+    {
+      "name":           "Charlotte",
+      "image_default":  "woman7.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Mia",
+      "image_default":  "woman8.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Ava",
+      "image_default":  "woman9.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Luna",
+      "image_default":  "woman10.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Zoe",
+      "image_default":  "woman11.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Chloe",
+      "image_default":  "woman12.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Nora",
+      "image_default":  "woman13.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Elena",
+      "image_default":  "woman14.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Riley",
+      "image_default":  "woman15.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Sofia",
+      "image_default":  "woman16.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Maya",
+      "image_default":  "woman17.png",
+      "logic":          "Casual-Normal"
+    },
+
+    {
+      "name":           "Ivy",
+      "image_default":  "woman18.png",
       "logic":          "Casual-Normal"
     }
   ]
