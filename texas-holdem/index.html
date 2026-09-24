@@ -17,33 +17,94 @@
   </style>
   <script nonce="o0jVYgjThAvzHKfWgEGCeA">
   if (!window.ytgame) {
-      window.ytgame = {
-        SDK_VERSION: "standalone",
-        IN_PLAYABLES_ENV: false,
-        SdkError: function (t) { this.errorType = t; this.message = ""; },
-        SdkErrorType: { UNDEFINED: 0, GAMEAPI_UNDEFINED: 1 },
-        game: {
-          firstFrameReady: function () {},
-          gameReady: function () {},
-          loadData: function () { return Promise.resolve(""); },
-          saveData: function () { return Promise.resolve(); }
-        },
-        engagement: { sendScore: function () { return Promise.resolve(); } },
-        ads: {
-          requestAd: function () { return Promise.resolve(3); },
-          requestInterstitialAd: function () { return Promise.resolve(); },
-          AdResult: { UNKNOWN: 0, SHOWED: 1, REJECTED: 3, DISMISSED: 2 }
-        },
-        health: { logError: function () {}, logWarning: function () {} },
-        system: {
-          getLanguage: function () { return Promise.resolve("en"); },
-          isAudioEnabled: function () { return true; },
-          onAudioEnabledChange: function () { return function () {}; },
-          onPause: function () { return function () {}; },
-          onResume: function () { return function () {}; }
+      (function () {
+        var SAVE_KEY = "funkitron-poker-playables-save";
+        var DB_NAME = "ytgame-playables-db";
+        var DB_STORE = "saves";
+
+        function openDb() {
+          return new Promise(function (resolve, reject) {
+            try {
+              var req = indexedDB.open(DB_NAME, 1);
+              req.onupgradeneeded = function () {
+                var db = req.result;
+                if (!db.objectStoreNames.contains(DB_STORE)) {
+                  db.createObjectStore(DB_STORE);
+                }
+              };
+              req.onsuccess = function () { resolve(req.result); };
+              req.onerror = function () { reject(req.error); };
+            } catch (e) { reject(e); }
+          });
         }
-      };
-      window.ytgamehelper = { myConsoleLog: function () {} };
+
+        function readDbSave() {
+          return new Promise(function (resolve, reject) {
+            openDb().then(function (db) {
+              try {
+                var tx = db.transaction(DB_STORE, "readonly");
+                var get = tx.objectStore(DB_STORE).get(SAVE_KEY);
+                get.onsuccess = function () { resolve(get.result || ""); };
+                get.onerror = function () { reject(get.error); };
+              } catch (e) { reject(e); }
+            }, reject);
+          });
+        }
+
+        function writeDbSave(bytes) {
+          return new Promise(function (resolve, reject) {
+            openDb().then(function (db) {
+              try {
+                var tx = db.transaction(DB_STORE, "readwrite");
+                tx.objectStore(DB_STORE).put(String(bytes), SAVE_KEY);
+                tx.oncomplete = function () { resolve(); };
+                tx.onerror = function () { reject(tx.error); };
+                tx.onabort = function () { reject(tx.error || new Error("aborted")); };
+              } catch (e) { reject(e); }
+            }, reject);
+          });
+        }
+
+        function loadSave() {
+          return readDbSave().catch(function () {
+            try { return localStorage.getItem(SAVE_KEY) || ""; } catch (e) { return ""; }
+          });
+        }
+
+        function persistSave(bytes) {
+          return writeDbSave(bytes).catch(function () {
+            try { localStorage.setItem(SAVE_KEY, String(bytes)); } catch (e) {}
+          });
+        }
+
+        window.ytgame = {
+          SDK_VERSION: "standalone",
+          IN_PLAYABLES_ENV: false,
+          SdkError: function (t) { this.errorType = t; this.message = ""; },
+          SdkErrorType: { UNDEFINED: 0, GAMEAPI_UNDEFINED: 1 },
+          game: {
+            firstFrameReady: function () {},
+            gameReady: function () {},
+            loadData: loadSave,
+            saveData: persistSave
+          },
+          engagement: { sendScore: function () { return Promise.resolve(); } },
+          ads: {
+            requestAd: function () { return Promise.resolve(3); },
+            requestInterstitialAd: function () { return Promise.resolve(); },
+            AdResult: { UNKNOWN: 0, SHOWED: 1, REJECTED: 3, DISMISSED: 2 }
+          },
+          health: { logError: function () {}, logWarning: function () {} },
+          system: {
+            getLanguage: function () { return Promise.resolve("en"); },
+            isAudioEnabled: function () { return true; },
+            onAudioEnabledChange: function () { return function () {}; },
+            onPause: function () { return function () {}; },
+            onResume: function () { return function () {}; }
+          }
+        };
+        window.ytgamehelper = { myConsoleLog: function () {} };
+      })();
     }
   </script>
   <script defer="defer" src="main.js?825b1708244249bfdba2" nonce="o0jVYgjThAvzHKfWgEGCeA"></script>
