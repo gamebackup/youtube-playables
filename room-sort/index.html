@@ -20,8 +20,14 @@
         game: {
           firstFrameReady: function () {},
           gameReady: function () {},
-          loadData: function () { return Promise.resolve(""); },
-          saveData: function () { return Promise.resolve(); }
+          loadData: function () {
+            try { return Promise.resolve(localStorage.getItem("room-sort-save") || ""); }
+            catch (e) { return Promise.resolve(""); }
+          },
+          saveData: function (data) {
+            try { localStorage.setItem("room-sort-save", data); } catch (e) {}
+            return Promise.resolve();
+          }
         },
         engagement: { sendScore: function () { return Promise.resolve(); } },
         ads: {
