@@ -1,0 +1,108 @@
+utility.number.delimiter=%SPACE%
+utility.decimal.delimiter=.
+button.yes=Yes
+button.no=No
+button.ok=Ok
+button.cancel=CANCEL
+button.save=SAVE
+button.prev=PREV
+button.next=NEXT
+button.resume=Resume
+button.enter=ENTER
+button.menu=Menu
+button.wordsFound=Words found
+button.play=Play
+button.newGame=New Game
+button.submitScore=Submit Score
+
+avatars.nameYou=You
+avatars.namePlayer=Player
+avatars.nameLegend=The Legend
+avatars.nameInfluencer=The Influencer
+avatars.nameKid=The Kid
+avatars.nameBrain=The Brain
+avatars.nameMom=The Mom
+avatars.nameToughie=The Toughie
+
+buttonPoker.raise=Raise
+buttonPoker.allIn=All In
+buttonPoker.call=Call
+buttonPoker.check=Check
+buttonPoker.fold=Fold
+buttonPoker.cashOut=Cash Out
+buttonPoker.continue=Continue
+buttonPoker.bet=Bet
+
+pokerAction.Check=Check
+pokerAction.Call=Call
+pokerAction.Bet=Bet
+pokerAction.Raise=Raise
+pokerAction.Fold=Fold
+pokerAction.AllIn=All In
+
+staticPoker.endingExcellent=EXCELLENT!
+staticPoker.endingWellPlayed=Well Played!
+staticPoker.endingNiceTry=Nice Try!
+staticPoker.finalScore=Final Score
+staticPoker.goodLuck=Good luck!
+staticPoker.welcomeNewPlayers=Welcome to all new players!
+
+staticPoker.endingBiggestWin=- Biggest Win -
+staticPoker.endingHandsPlayed= - Hands -
+staticPoker.endingYouFinished=You Finished #FINISHING_PLACE
+staticPoker.endingYouWin=CONGRATS! You Win!
+staticPoker.endingTourneyWinner1=PLAYER_NAME wins the Tourney!
+staticPoker.endingTourneyWinner2=You win the Tourney!
+staticPoker.endingSurvivedAllRounds=You have survived all ROUND_NUMBER rounds!
+staticPoker.endingOutOfMoney1=PLAYER_NAME, you are out of money!
+staticPoker.endingOutOfMoney2=You are out of money!
+
+staticPoker.beginRoundNumber=We are starting up round ROUND_NUMBER of MAX_NUMBER.
+staticPoker.beginRoundIfYouArePlaying=Okay, everyone:\nif you are playing, then...
+staticPoker.beginRoundAnteUp=...ante up!
+staticPoker.beginRoundAfterTheseMessages=We'll be right back after\nthis quick word from our sponsors!
+
+staticPoker.nextCardFlop=Here comes the flop!
+staticPoker.nextCardTurn=Here's the turn!
+staticPoker.nextCardRiver=And here's the river!
+
+staticPoker.increaseBetButtonTip=Hold down this button to quickly increase the bet
+staticPoker.decreaseBetButtonTip=Hold down this button to quickly decrease the bet
+
+staticPokerDealer.hereAreYourCards=Here are your cards.
+staticPokerDealer.goodByePlayers=Goodbye to all who've lost!
+
+staticPokerDealer.potPayout1=The house keeps the POT_VALUE pot!
+staticPokerDealer.potPayout2=The house keeps the POT_VALUE side pot!
+staticPokerDealer.potPayout3=PLAYER_NAME wins the pot\nbecause everyone else folded
+staticPokerDealer.potPayout4=PLAYER_NAME win the pot\nbecause everyone else folded
+staticPokerDealer.potPayout5=PLAYER_NAME win the side pot\nbecause everyone else folded
+staticPokerDealer.potPayout6=PLAYER_NAME wins the side pot\nbecause everyone else folded
+staticPokerDealer.potPayout7=PLAYER_NAME wins the\nPOT_VALUE pot
+staticPokerDealer.potPayout8=PLAYER_NAME win the\nPOT_VALUE pot
+staticPokerDealer.potPayout9=PLAYER_NAME win the\nPOT_VALUE side pot
+staticPokerDealer.potPayout10=PLAYER_NAME wins the\nPOT_VALUE side pot
+staticPokerDealer.potPayout11=The pot of POT_VALUE is split!
+staticPokerDealer.potPayout12=The side pot of POT_VALUE is split
+
+staticPokerHand.handRankings=POKER HAND RANKINGS
+staticPokerHand.royalFlush=Royal Flush
+staticPokerHand.straightFlush=Straight Flush
+staticPokerHand.fourOfAKind=Four of a Kind
+staticPokerHand.fullHouse=Full House
+staticPokerHand.flush=Flush
+staticPokerHand.straight=Straight
+staticPokerHand.threeOfAKind=Three of a Kind
+staticPokerHand.twoPair=Two Pair
+staticPokerHand.pair=Pair
+staticPokerHand.highCard=High Card
+
+panelMenu.hands=hands
+panelMenu.speed=speed
+panelMenu.sound=sound
+panelMenu.music=music
+panelMenu.saveAndQuit=save & return
+panelMenu.submitScore=submit score
+menuTitle.reallyQuit=Really submit?
+
+loading=Loading

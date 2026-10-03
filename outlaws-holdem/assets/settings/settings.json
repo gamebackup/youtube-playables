@@ -1,0 +1,45 @@
+{
+	"setting01": {
+		"allowAds": false,
+		"allowLandscapeOnMobile": true,
+		"allowResuming": true,
+		"blindIncrement": 40,
+		"blindIncrementTournamentStyle": false,
+		"clientApi": "youtube",
+		"handsPrBlindIncrement": 7,
+		"gameMode": "SIT_AND_GO",
+		"HandsPrInterstitial": 7,
+		"listenToUnmuteEvent": true,
+		"minutesPrBlinkdIncrement": 0,
+		"OpponentsAreSequential": true,
+		"useAlternativeMenuIcon": true,
+		"showArkadiumLogo": 1,
+		"showGameEndInterstitial": false,
+		"showVersionInGame": 0,
+		"startingBlind": 40,
+		"startMoneys": 2000,
+		"TotalRounds_SitGo": 10,
+		"AiClassList": [
+			{
+				"name": "Casual-Pro",
+				"base_logic": "Casual",
+				"pure_table_card_scale": 35
+			},
+			{
+				"name": "Casual-Normal",
+				"base_logic": "Casual",
+				"pure_table_card_scale": 50
+			},
+			{
+				"name": "Casual-Noob",
+				"base_logic": "Casual",
+				"pure_table_card_scale": 75
+			},
+			{
+				"name": "Casual",
+				"base_logic": "Casual",
+				"pure_table_card_scale": 100
+			}
+		]
+	}
+}
