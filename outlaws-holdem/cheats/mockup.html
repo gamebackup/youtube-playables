@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outlaws — Cheat Shop mockup</title>
+<link rel="stylesheet" href="shop.css">
+<style>
+  /* ---------------------------------------------------------------- harness */
+  /* Fake felt + seat plates so the overlay can be judged in context. */
+  html, body { height: 100%; margin: 0; background: #050d09; overflow: hidden; }
+  #stage {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 1000px; height: 700px; max-width: 100vw; max-height: 100vh;
+    overflow: hidden; border-radius: 4px;
+    background:
+      radial-gradient(ellipse 70% 58% at 50% 52%, #1d5b3f 0%, #14442f 55%, #0b2a1d 100%),
+      #062015;
+    box-shadow: 0 0 0 1px #000, 0 30px 90px rgba(0,0,0,.7);
+    font-family: 'Aaux Next', 'Trebuchet MS', system-ui, sans-serif;
+    color: #eef6f0;
+  }
+  #stage::after { /* vignette */
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 55%, rgba(0,0,0,.5) 100%);
+  }
+  /* Track the stage size so shop.js's canvas-based --u unit is correct. */
+  #stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .plate {
+    position: absolute; transform: translate(-50%, -50%);
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 11px; border-radius: 20px;
+    background: rgba(6,20,14,.82); border: 1px solid rgba(240,180,41,.3);
+    font-size: 12px; letter-spacing: .6px; white-space: nowrap;
+  }
+  .plate b { color: #f0b429; font-weight: 700; }
+  .plate.folded { opacity: .45; border-color: rgba(255,255,255,.14); }
+  .plate .cards { display: flex; gap: 3px; }
+  .plate .cards i {
+    font-style: normal; font-size: 12px; font-weight: 700; padding: 1px 4px;
+    border-radius: 3px; background: #f6f8f7; color: #10181a;
+  }
+  .plate .cards i.red { color: #c62828; }
+  .plate .cards i.back { background: #2b4a5c; color: #8fb3c7; }
+
+  #pot { position: absolute; left: 50%; top: 30%; transform: translateX(-50%); text-align: center; }
+  #pot .amt { font-size: 26px; font-weight: 700; color: #ffd166; text-shadow: 0 2px 6px #000; }
+  #pot .lbl { font-size: 10px; letter-spacing: 2px; color: #9db3a7; text-transform: uppercase; }
+  #board { position: absolute; left: 50%; top: 42%; transform: translateX(-50%); display: flex; gap: 8px; }
+  #board i {
+    font-style: normal; width: 46px; height: 64px; display: grid; place-items: center;
+    border-radius: 6px; background: #f6f8f7; color: #10181a; font-weight: 700; font-size: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.45);
+  }
+  #board i.red { color: #c62828; }
+  #board i.empty { background: rgba(255,255,255,.05); color: #3f5a4d; border: 1px dashed rgba(255,255,255,.14); box-shadow: none; }
+  #betbar { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); display: flex; gap: 10px; }
+  #betbar button {
+    font: inherit; font-size: 13px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 10px 22px; border-radius: 8px; cursor: pointer;
+    border: 1px solid rgba(240,180,41,.4); background: linear-gradient(#226245,#123626); color: #eef6f0;
+  }
+  #betbar button.raise { background: linear-gradient(#2f6b4c,#173d2b); border-color: #f0b429; color: #ffd166; }
+
+  /* --------------------------------------------------------- mockup toolbar */
+  #dev {
+    position: absolute; right: 10px; bottom: 10px; z-index: 9999;
+    display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; max-width: 62%;
+  }
+  #dev button {
+    font: 11px/1 ui-monospace, Consolas, monospace; color: #9db3a7; cursor: pointer;
+    padding: 5px 8px; border-radius: 4px;
+    border: 1px solid rgba(255,255,255,.16); background: rgba(6,20,14,.9);
+  }
+  #dev button:hover { color: #f0b429; border-color: rgba(240,180,41,.5); }
+  #dev .lbl {
+    align-self: center; font: 10px ui-monospace, Consolas, monospace;
+    letter-spacing: 1.4px; color: #4d6a5c; text-transform: uppercase; padding: 0 6px 0 0;
+  }
+  #devnote {
+    position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 9999;
+    font: 10.5px ui-monospace, Consolas, monospace; letter-spacing: .6px; color: #4d6a5c;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <!-- Layout anchor: cheats/shop.js sizes itself off this canvas's clientWidth,
+       exactly as it does in the real game. -->
+  <canvas width="1000" height="700"></canvas>
+  <div id="pot"><div class="amt" id="potAmt">0</div><div class="lbl">pot</div></div>
+  <div id="board"></div>
+  <div id="betbar">
+    <button id="bFold">Fold</button>
+    <button id="bCheck">Check</button>
+    <button id="bCall">Call</button>
+    <button class="raise" id="bRaise">Raise</button>
+  </div>
+  <div id="devnote">mockup harness &mdash; stub model, no game code</div>
+  <div id="dev">
+    <span class="lbl">deal</span>
+    <button data-act="flop">flop</button>
+    <button data-act="turn">turn</button>
+    <button data-act="river">river</button>
+    <button data-act="newhand">new hand</button>
+    <span class="lbl">bot</span>
+    <button data-act="botturn">act</button>
+    <button data-act="botcheck">check</button>
+    <button data-act="botfold">fold</button>
+    <span class="lbl">you</span>
+    <button data-act="iwin">win pot</button>
+    <button data-act="ireset">reset me</button>
+    <span class="lbl">view</span>
+    <button data-act="credits">+500 cred</button>
+    <button data-act="grant">grant all</button>
+  </div>
+</div>
+
+<script>
+/* ===========================================================================
+ * Stub poker model — same shape as the real GameplayModel / CurrentTable so
+ * cheats/shop.js runs unmodified. Lets the UI be reviewed without the game.
+ * ========================================================================= */
+(function () {
+  'use strict';
+
+  // Harness diagnostics: surface boot failures instead of silently leaving the
+  // toolbar dead. Read window.__bootErr from the console.
+  window.__bootErr = null;
+  window.addEventListener('error', function (e) {
+    if (!window.__bootErr) window.__bootErr = String(e.message) + ' @' + e.lineno;
+  });
+
+  var AV = { HIDDEN: 0, INACTIVE: 1, ACTIVE: 2, FOLDED: 3, ALL_IN_ACTIVE: 4 };
+  // Matches the engine: 1 while hole cards deal, then 2 pre-flop, 3 flop,
+  // 4 turn, 5 river.
+  var ROUND = { DEALING: 1, PREFLOP: 2, FLOP: 3, TURN: 4, RIVER: 5 };
+
+  function nameOf(p) {
+    var n = p.name;
+    return n.value || n.text || n.textValue || 'Player';
+  }
+
+  function makeHand() {
+    return { Card1: { cardIndex: -1, cardFaceUp: false, visible: false }, Card2: { cardIndex: -1, cardFaceUp: false, visible: false } };
+  }
+
+  function makeSlot() {
+    return { cardIndex: -1, cardFaceUp: true, visible: false, resetToNULL: function () { this.cardIndex = -1; this.visible = false; } };
+  }
+
+  function makeSeat(name, money, controller) {
+    return {
+      name: { value: name, text: name, shouldDisplay: true },
+      moneyPool: { value: money },
+      currentBet: { value: 0 },
+      availability: AV.ACTIVE,
+      actionId: -1,
+      concurrentAllIns: 0,
+      currentHand: makeHand(),
+      logicController: controller,
+      isLocalPlayer: function () { return this === table.playerObj; },
+    };
+  }
+
+  // The board cards dealt so far, as a contiguous prefix (matches shop.js).
+  function board() {
+    var slots = ['tableCard_Flop1', 'tableCard_Flop2', 'tableCard_Flop3', 'tableCard_Turn', 'tableCard_River'];
+    var out = slots.map(function (k) {
+      var s = table[k];
+      return s.visible && s.cardIndex >= 0 ? s.cardIndex : -1;
+    });
+    var n = 0;
+    while (n < out.length && out[n] >= 0) n++;
+    return out.slice(0, n);
+  }
+
+  // The Casual AI's real decision shape, condensed: a hand-score threshold walk
+  // that returns 0 check / 1 call / 2 fold / 3 raise.
+  //
+  // beginTurn/handleTurn live on the prototype on purpose. The engine's own
+  // AiPokerPlayer_Casual does the same, and Mind Control restores the real
+  // behaviour with `delete ctrl.handleTurn` — which only works if the override
+  // was an own property shadowing a prototype method. Defining them per-instance
+  // here would make `delete` destroy the method and silently break the harness.
+  function ControllerStub() {
+    this._random = { random: Math.random };
+    this.handQuality = [0, 0, 0, 0, 0, 0, 0, 0];
+    this.isAggressive = false;
+    this.finalBetAmount = 0;
+    this.MAX_THINK_TIME = 3000;
+    this._canCheck = true;
+    this._canCall = true;
+    this._canFold = true;
+    this._canRaise = true;
+  }
+  ControllerStub.prototype = {
+    constructor: ControllerStub,
+    beginTurn: function (model, player) {
+      var b = board().filter(function (c) { return c >= 0; });
+      var h = player.currentHand;
+      this.handQuality = window.CheatShop
+        ? window.CheatShop.evaluate([h.Card1.cardIndex, h.Card2.cardIndex].concat(b))
+        : [0, 0, 0, 0, 0, 0];
+      var d = model.CurrentTable.houseCardDealer;
+      this._canCheck = d.currentHighBetValue === player.currentBet.value;
+      this._canCall = d.currentHighBetValue > player.currentBet.value;
+      this._canRaise = player.moneyPool.value > d.currentHighBetValue;
+    },
+    handleTurn: function (timeLeft, dt, model, player) {
+      if (this.handQuality[0] >= 6 && this._canRaise && this._random.random() < 0.7) {
+        this.finalBetAmount = model.CurrentTable.houseCardDealer.currentHighBetValue * 2 + 20;
+        return 3;
+      }
+      if (this._canCheck) return 0;
+      if (this.handQuality[0] >= 4 && this._canRaise && this._random.random() < 0.3) {
+        this.finalBetAmount = model.CurrentTable.houseCardDealer.currentHighBetValue * 2 + 20;
+        return 3;
+      }
+      if (this.handQuality[0] >= 1 || this._random.random() < 0.6) return 1;
+      return 2;
+    },
+  };
+  function makeController() { return new ControllerStub(); }
+
+  var deck = {
+    _cards: [],
+    _currentIndex: 0,
+    _numberOfDecks: 1,
+    _random: { random: Math.random },
+    HasCards: function () { return this._currentIndex < this._cards.length; },
+    PullCard: function () {
+      if (!this.HasCards()) return -1;
+      return this._cards[this._currentIndex++];
+    },
+    RebuildDeck: function () {
+      this._cards = [];
+      for (var i = 0; i < 52; i++) this._cards.push(i);
+      this._currentIndex = 0;
+    },
+    Shuffle: function () {
+      var c = this._cards;
+      for (var i = c.length - 1; i > 0; i--) {
+        var j = Math.floor(this._random.random() * (i + 1));
+        var t = c[i]; c[i] = c[j]; c[j] = t;
+      }
+      this._currentIndex = 0;
+    },
+  };
+
+  var dealer = {
+    currentDeck: deck,
+    displayPot: { value: 0 },
+    currentPot: { value: 0 },
+    baseBetAmount: 20,
+    currentHighBetValue: 20,
+    currentNumberOfRaises: 0,
+    lastRaise: 0,
+    adviceText: '',
+  };
+
+  var table = {
+    houseCardDealer: dealer,
+    tableCard_Flop1: makeSlot(),
+    tableCard_Flop2: makeSlot(),
+    tableCard_Flop3: makeSlot(),
+    tableCard_Turn: makeSlot(),
+    tableCard_River: makeSlot(),
+    playerObj: null,
+    opponentList: [],
+    currentRound: ROUND.PREFLOP,
+    currentHandNumber: 1,
+    GameButtons: null,
+    isUserPlaying: function () { return true; },
+    getPlayer: function (i) { return i === 0 ? this.playerObj : this.opponentList[i - 1]; },
+    getMaxPlayersAtTable: function () { return this.opponentList.length + 1; },
+    getActivePlayer: function () { return window.__active; },
+  };
+
+  window.__poker = { CurrentTable: table, AvatarAvalibilityIDs: AV, currentGameplayModel: window.__poker };
+
+  // CardCalculator shim so the shop reports the same category it would in game.
+  window.__CC = {
+    CardCalculator: {
+      getCardCombination: function (a, b, c, d, e, f, g) {
+        var cards = [a, b, c, d, e, f, g];
+        var sc = window.CheatShop.evaluate(cards);
+        return [sc[0], sc[1], sc[2], sc[3], sc[4], sc[5], sc[0] * 100, sc[1]];
+      },
+    },
+    CardCombinationPowersID: { INVALID: -1, HIGH_CARD: 0, PAIR: 1, TWO_PAIR: 2, THREE_OF_A_KIND: 3, STRAIGHT: 4, FLUSH: 5, FULL_HOUSE: 6, FOUR_OF_A_KIND: 7, STRAIGHT_FLUSH: 8, ROYAL_FLUSH: 9 },
+  };
+
+  table.playerObj = makeSeat('You', 5000, null);
+  var BOTS = [
+    { name: 'Vic Voltage', seat: [-0.32, 0.20], money: 4800 },
+    { name: 'Ida Ice', seat: [0.00, -0.16], money: 6100 },
+    { name: 'Roxy Rail', seat: [0.33, 0.20], money: 3650 },
+  ];
+  BOTS.forEach(function (b) {
+    var seat = makeSeat(b.name, b.money, makeController());
+    b.seatObj = seat;
+    table.opponentList.push(seat);
+  });
+
+  // -------------------------------------------------------------- rendering --
+  var stage = document.getElementById('stage');
+  var plates = [];
+
+  function cardChip(idx) {
+    if (typeof idx !== 'number' || idx < 0) return '<i class="back">??</i>';
+    var R = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    var S = ['\u2663','\u2666','\u2665','\u2660'];
+    var p = idx % 13, s = Math.floor(idx / 13);
+    return '<i class="' + (s === 1 || s === 2 ? 'red' : '') + '">' + R[p] + S[s] + '</i>';
+  }
+
+  function layoutSeats() {
+    BOTS.forEach(function (b, i) {
+      var el = plates[i];
+      el.style.left = (50 + b.seat[0] * 50) + '%';
+      el.style.top = (50 + b.seat[1] * 62) + '%';
+    });
+  }
+
+  function buildPlates() {
+    BOTS.forEach(function (b) {
+      var p = document.createElement('div');
+      p.className = 'plate';
+      stage.appendChild(p);
+      plates.push(p);
+    });
+    var me = document.createElement('div');
+    me.className = 'plate';
+    me.style.left = '50%';
+    me.style.top = '88%';
+    stage.appendChild(me);
+    plates.push(me);
+    layoutSeats();
+  }
+
+  // Whether the harness plates should show every bot's cards. The cheat engine
+  // drives this via cardFaceUp, mirrored by the poll at the bottom of the file.
+  var revealAll = false;
+  window.__setRevealAll = function (v) { revealAll = !!v; paint(); };
+
+  function paint() {
+    var reveal = revealAll;
+    plates.forEach(function (el, i) {
+      var seat = i < BOTS.length ? BOTS[i].seatObj : table.playerObj;
+      var h = seat.currentHand;
+      var shown = i === BOTS.length || reveal || h.Card1.cardFaceUp;
+      el.className = 'plate' + (seat.availability === AV.FOLDED ? ' folded' : '');
+      el.innerHTML = '<b>' + nameOf(seat) + '</b><span class="cards">' +
+        (shown ? cardChip(h.Card1.cardIndex) + cardChip(h.Card2.cardIndex) : cardChip(-1) + cardChip(-1)) +
+        '</span><span>' + seat.moneyPool.value + '</span>';
+    });
+
+    var slots = ['tableCard_Flop1', 'tableCard_Flop2', 'tableCard_Flop3', 'tableCard_Turn', 'tableCard_River'];
+    document.getElementById('board').innerHTML = slots.map(function (k) {
+      var s = table[k];
+      return (s.visible && s.cardIndex >= 0) ? cardChip(s.cardIndex) : '<i class="empty">&nbsp;</i>';
+    }).join('');
+    document.getElementById('potAmt').textContent = dealer.displayPot.value;
+  }
+
+  // ------------------------------------------------------------------- flow --
+  function dealRound(n) {
+    var keys = ['tableCard_Flop1', 'tableCard_Flop2', 'tableCard_Flop3'];
+    for (var i = 0; i < n; i++) {
+      var s = table[keys[i]];
+      s.cardIndex = deck.PullCard();
+      s.visible = true;
+      s.cardFaceUp = true;
+    }
+    table.currentRound = ROUND.FLOP;
+  }
+
+  function nextRound() {
+    if (table.currentRound < ROUND.FLOP) { dealRound(3); dealer.currentHighBetValue = 40; dealer.displayPot.value = 160; }
+    else if (table.currentRound === ROUND.FLOP) {
+      var t = table.tableCard_Turn; t.cardIndex = deck.PullCard(); t.visible = true;
+      table.currentRound = ROUND.TURN; dealer.currentHighBetValue = 80;
+    } else if (table.currentRound === ROUND.TURN) {
+      var r = table.tableCard_River; r.cardIndex = deck.PullCard(); r.visible = true;
+      table.currentRound = ROUND.RIVER; dealer.currentHighBetValue = 160;
+    }
+    refoldBots();
+  }
+
+  function refoldBots() {
+    table.opponentList.forEach(function (b) {
+      if (b.availability === AV.FOLDED) return;
+      b.availability = AV.ACTIVE;
+      b.currentBet.value = dealer.baseBetAmount;
+    });
+    table.playerObj.currentBet.value = dealer.baseBetAmount;
+    dealer.currentHighBetValue = dealer.baseBetAmount;
+  }
+
+  function newHand() {
+    deck.RebuildDeck();
+    deck.Shuffle();
+    ['tableCard_Flop1','tableCard_Flop2','tableCard_Flop3','tableCard_Turn','tableCard_River'].forEach(function (k) {
+      table[k].resetToNULL();
+    });
+    var all = [table.playerObj].concat(table.opponentList);
+    all.forEach(function (p) {
+      p.currentHand = makeHand();
+      p.currentHand.Card1.cardIndex = deck.PullCard();
+      p.currentHand.Card2.cardIndex = deck.PullCard();
+      p.currentHand.Card1.visible = true;
+      p.currentHand.Card2.visible = true;
+      p.currentBet.value = dealer.baseBetAmount;
+      p.availability = AV.ACTIVE;
+      p.actionId = -1;
+      p.concurrentAllIns = 0;
+      p.moneyPool.value = Math.max(500, p.moneyPool.value - dealer.baseBetAmount);
+      if (p.logicController) {
+        p.logicController.isAggressive = p.logicController._random.random() < 0.5;
+        p.logicController.beginTurn(window.__poker, p);
+      }
+    });
+    dealer.currentHighBetValue = dealer.baseBetAmount;
+    dealer.displayPot.value = dealer.baseBetAmount * all.length;
+    dealer.currentNumberOfRaises = 0;
+    table.currentRound = ROUND.PREFLOP;
+    table.currentHandNumber++;
+    window.__active = table.opponentList[0];
+  }
+
+  function botAct() {
+    var b = window.__active || table.opponentList[0];
+    b.logicController.beginTurn(window.__poker, b);
+    var res = b.logicController.handleTurn(0.5, 0.016, window.__poker, b);
+    b.actionId = res;
+    if (res === 2) {
+      b.availability = AV.FOLDED;
+    } else if (res === 3) {
+      var amt = b.logicController.finalBetAmount || dealer.currentHighBetValue * 2;
+      dealer.displayPot.value += amt - b.currentBet.value;
+      b.currentBet.value = amt;
+      dealer.currentHighBetValue = amt;
+      dealer.currentNumberOfRaises++;
+    } else if (res === 1) {
+      var call = dealer.currentHighBetValue;
+      dealer.displayPot.value += call - b.currentBet.value;
+      b.currentBet.value = call;
+    }
+    var next = table.opponentList.filter(function (x) { return x.availability === AV.ACTIVE && x !== b; })[0];
+    window.__active = next || table.playerObj;
+    paint();
+  }
+
+  // ------------------------------------------------------------- wiring up --
+  document.addEventListener('DOMContentLoaded', function () {
+    buildPlates();
+    newHand();
+    window.__setRevealAll(false);
+
+    document.getElementById('bCheck').onclick = function () { table.playerObj.actionId = 0; nextBot(); };
+    document.getElementById('bCall').onclick = function () { table.playerObj.actionId = 1; nextBot(); };
+    document.getElementById('bRaise').onclick = function () {
+      table.playerObj.actionId = 3;
+      dealer.currentHighBetValue += 40;
+      table.playerObj.currentBet.value = dealer.currentHighBetValue;
+      nextBot();
+    };
+    document.getElementById('bFold').onclick = function () {
+      table.playerObj.actionId = 2;
+      table.playerObj.availability = AV.FOLDED;
+      nextBot();
+    };
+
+    function nextBot() {
+      var live = table.opponentList.filter(function (x) { return x.availability === AV.ACTIVE; });
+      window.__active = live[0] || table.playerObj;
+      paint();
+    }
+
+    document.getElementById('dev').addEventListener('click', function (e) {
+      var act = e.target.getAttribute && e.target.getAttribute('data-act');
+      if (!act) return;
+      if (act === 'flop' || act === 'turn' || act === 'river') nextRound();
+      else if (act === 'newhand') newHand();
+      else if (act === 'botturn') botAct();
+      else if (act === 'botcheck') { window.__active.actionId = 0; }
+      else if (act === 'botfold') { window.__active.actionId = 2; window.__active.availability = AV.FOLDED; }
+      else if (act === 'iwin') { table.playerObj.moneyPool.value += dealer.displayPot.value; dealer.displayPot.value = 0; }
+      else if (act === 'ireset') {
+        table.playerObj.currentHand = makeHand();
+        table.playerObj.currentHand.Card1.cardIndex = deck.PullCard();
+        table.playerObj.currentHand.Card2.cardIndex = deck.PullCard();
+      }
+      else if (act === 'credits') { window.CheatShop.state.credits += 500; }
+      else if (act === 'grant') {
+        window.CheatShop.items.forEach(function (it) {
+          window.CheatShop.state.owned[it.id] = true;
+          window.CheatShop.state.active[it.id] = true;
+        });
+        window.CheatShop.state.credits += 2000;
+      }
+      paint();
+      window.CheatShop.tick();
+    });
+
+    setInterval(paint, 400);
+    paint();
+    window.CheatShop.tick();
+  });
+})();
+</script>
+<script src="shop.js"></script>
+<script>
+  // Reuse the engine's own idea of "should we show these cards" so X-Ray is
+  // visible in the harness plates too.
+  setInterval(function () {
+    if (!window.__poker || !window.__setRevealAll) return;
+    var t = window.__poker.CurrentTable;
+    var anyFaceUp = t.opponentList.some(function (b) {
+      return b.currentHand.Card1.cardFaceUp || b.currentHand.Card2.cardFaceUp;
+    });
+    if (anyFaceUp !== window.__revealed) {
+      window.__revealed = anyFaceUp;
+      window.__setRevealAll(anyFaceUp);
+    }
+  }, 150);
+</script>
+</body>
+</html>

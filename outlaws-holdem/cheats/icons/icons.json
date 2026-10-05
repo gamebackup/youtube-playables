@@ -1,0 +1,15 @@
+{
+  "_readme": "Maps a cheat id to your artwork, e.g. \"xray\": \"xray.png\". Paths are relative to this folder. Anything not listed uses the built-in inline placeholder, so this file can stay exactly as it is until you have art. Drop the file in, add its line, reload. Delete the line to go back to the placeholder.",
+  "xray": null,
+  "tell": null,
+  "predictor": null,
+  "sleeves": null,
+  "insidejob": null,
+  "taxman": null,
+  "dice": null,
+  "stack": null,
+  "bottom": null,
+  "shredder": null,
+  "mindcontrol": null,
+  "badge": null
+}
