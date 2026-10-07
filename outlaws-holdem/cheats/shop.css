@@ -60,6 +60,10 @@
   padding: calc(9 * var(--u)) calc(16 * var(--u)) calc(9 * var(--u)) calc(10 * var(--u));
   font-size: calc(15 * var(--u));
 }
+
+/* Stays hidden until the player presses Play on the intro screen. */
+.cs-open.cs-locked { display: none; }
+
 .cs-open .cs-open-icon { width: calc(34 * var(--u)); height: calc(34 * var(--u)); flex: none; }
 .cs-open img, .cs-open-icon svg { width: 100%; height: 100%; display: block; }
 .cs-open .cs-open-label { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.05; }
@@ -324,11 +328,12 @@
 
 /* --------------------------------------------------------------------- toast */
 
+/* Sits directly above the open button (bottom-left) rather than bottom-centre,
+   which is where the game's own chip counter lives. */
 .cs-toast {
   position: absolute;
-  left: 50%;
-  bottom: calc(84 * var(--u));
-  transform: translateX(-50%);
+  left: calc(14 * var(--u));
+  bottom: calc(78 * var(--u));
   padding: calc(8 * var(--u)) calc(16 * var(--u));
   border: calc(1 * var(--u)) solid var(--line);
   border-radius: calc(30 * var(--u));

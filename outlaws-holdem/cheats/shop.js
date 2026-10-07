@@ -41,9 +41,9 @@
   // ============================================================== constants ==
 
   var SAVE_KEY = 'outlaws-cheats-v1';
-  var START_CREDITS = 150;
-  var HAND_PAY = 20; // credits for surviving a hand
-  var WIN_BONUS_PER_100 = 1; // extra credits per 100 chips won
+  var START_CREDITS = 0;
+  var HAND_PAY = 5; // credits for surviving a hand
+  var WIN_BONUS_PER_150 = 1; // extra credits per 150 chips won
 
   var SUIT_GLYPH = ['♣', '♦', '♥', '♠'];
   var RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -359,6 +359,13 @@
     // Which cheats have actually been applied to the live table, so engineTick
     // knows which ones still need unwinding. Runtime only, never persisted.
     installed: {},
+    // New Game does NOT rebuild the GameplayModel, so the object on window.__poker
+    // is unchanged and identity tells us nothing. These hold the last reading of
+    // the model's own counters instead, which is what a reset moves backwards.
+    // Runtime only, never persisted.
+    sawGame: false,
+    lastHand: null,
+    lastTime: null,
     tell: null,
     predict: null,
   };
@@ -768,7 +775,73 @@
 
   var lastStatus = {};
 
+  // "New Game" resets the chips in place. main.js wires the button to
+  // setupNewGame() on the model rather than back through _play(), so the object
+  // on window.__poker survives and a changed-object test never fires.
+  //
+  // What the reset does move is the model's own counters: currentHandNumber goes
+  // back to 1 and timePlayed restarts. Both only ever step forward inside a
+  // session, and Continue keeps them going, so a value that steps backwards is
+  // exactly "the chips were reset". Reading counters rather than identity also
+  // still catches the case where the model is rebuilt, because a fresh hand 1
+  // reads backwards against the old game's lastHand.
+  //
+  // A page load is deliberately not a new game: the first reading of a session
+  // only takes a baseline, so reloading to resume saved cred does not wipe it.
+  // The baseline is kept across trips through the menu, otherwise arriving back
+  // at a fresh game would look like a first reading instead of a reset.
+  var NEW_GAME_TIME_SLACK = 0.25;
+
+  function trackNewGame() {
+    var g = game();
+    if (!g) return; // main menu: keep the baseline for the next entry
+    var t = g.CurrentTable;
+    var hand = t && typeof t.currentHandNumber === 'number' ? t.currentHandNumber : null;
+    var time = typeof g.timePlayed === 'number' ? g.timePlayed : null;
+
+    if (!state.sawGame) {
+      state.sawGame = true;
+      state.lastHand = hand;
+      state.lastTime = time;
+      return;
+    }
+
+    var reset =
+      (hand !== null && state.lastHand !== null && hand < state.lastHand) ||
+      (time !== null && state.lastTime !== null && time < state.lastTime - NEW_GAME_TIME_SLACK);
+    if (hand !== null) state.lastHand = hand;
+    if (time !== null) state.lastTime = time;
+    if (!reset) return;
+
+    state.credits = 0;
+    // Purchases go with the chips. cred was wiped, so the things bought with it
+    // go too -- otherwise the player keeps X-Ray Vision and Fold Predictor they
+    // paid for out of a balance that no longer exists.
+    //
+    // state.installed is deliberately left alone. The unwind pass below keys off
+    // it, so clearing it here would strand whatever the old table is still
+    // carrying (face-up hole cards, arm effects) with nothing left to switch it
+    // off. Leave the flags set and that same pass retires them on this tick.
+    state.owned = {};
+    state.active = {};
+    state.tell = null;
+    state.predict = null;
+    // Re-baseline the hand bookkeeping. Without this the new game's hand 1 would
+    // read as a hand change against the old game's seenHand and pay out a
+    // phantom credit, and handStartMoney would still hold the old stack.
+    state.seenHand = -1;
+    state.handStartMoney = 0;
+    state.lastBet = {};
+    state.lastAction = {};
+    state.diceUsed = false;
+    state.deckStamp = '';
+    save();
+    toast('New game — cred and purchases reset');
+  }
+
   function engineTick() {
+    trackNewGame();
+    setStarted(!!game());
     var ctx = context();
     if (!ctx) {
       setConnected(false);
@@ -787,7 +860,7 @@
       state.lastAction = {};
       if (!first) {
         var won = Math.max(0, moneyOf(ctx.me) - state.handStartMoney);
-        var pay = HAND_PAY + Math.floor(won / 100) * WIN_BONUS_PER_100;
+        var pay = HAND_PAY + Math.floor(won / 150) * WIN_BONUS_PER_150;
         state.credits += pay;
         save();
         toast('+' + pay + ' cred — hand ' + handNo + (won > 0 ? ' · won ' + won : ''), 'good');
@@ -823,7 +896,7 @@
   // ====================================================================== UI ===
 
   var root, el = {};
-  var ui = { open: false, connected: false, credits: -1, picker: null };
+  var ui = { open: false, connected: false, credits: -1, picker: null, started: false };
 
   function h(tag, cls, text) {
     var e = document.createElement(tag);
@@ -921,6 +994,16 @@
     if (!v) renderHud(null);
   }
 
+  // The intro screen has no GameplayModel yet, so the open button stays hidden
+  // until the player presses Play and the model gets constructed. That is the
+  // same hook the shop already uses for the table, via game().
+  function setStarted(v) {
+    if (ui.started === v) return;
+    ui.started = v;
+    if (!el.open) return;
+    el.open.classList.toggle('cs-locked', !v);
+  }
+
   // The open button is rebuilt when the icon manifest resolves, since its icon
   // is the one most likely to be swapped out.
   //
@@ -942,7 +1025,7 @@
     root.id = 'cheat-root';
 
     // open button ---------------------------------------------------------
-    el.open = h('button', 'cs-btn cs-open');
+    el.open = h('button', 'cs-btn cs-open cs-locked');
     el.open.type = 'button';
     el.open.title = 'Cheat shop';
     buildOpenBtn();
@@ -961,7 +1044,7 @@
     var head = h('div', 'cs-head');
     var titleWrap = h('div');
     titleWrap.appendChild(h('h2', null, 'Cheat Shop'));
-    titleWrap.appendChild(h('div', 'cs-sub', 'Nothing is real here. Not your chips, not theirs.'));
+    titleWrap.appendChild(h('div', 'cs-sub', '5 cred per hand survived, +1 per 150 chips of profit'));
     head.appendChild(titleWrap);
     head.appendChild(h('div', 'cs-head-spacer'));
     el.cred2 = h('div', 'cs-cred', state.credits + ' CRED');
